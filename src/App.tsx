@@ -8,7 +8,7 @@ import React, {
 import axios from "axios";
 import "./App.css";
 
-const FLASK_SERVER_URL = "http://localhost:5000";
+const FLASK_SERVER_URL = import.meta.env.API_URL;
 
 interface Message {
   user: string;
@@ -88,7 +88,7 @@ const App: React.FC = () => {
 
       <div
         className={
-          "w-full max-w-md max-h-[50rem] bg-white p-4 rounded-md shadow-md overflow-auto " +
+          "w-full max-w-md max-h-[50rem] bg-white p-4 rounded-md shadow-md overflow-auto" +
           (messages.length ? "" : "hidden")
         }
       >
@@ -96,7 +96,7 @@ const App: React.FC = () => {
           <p
             key={index}
             className={
-              "mb-2 " + (msg.isUser ? "text-right" : "text-left") // Add this line
+              "mb-2 " + (msg.user ? "text-right" : "text-left") // Add this line
             }
           >
             <strong className="font-semibold">{msg.user}:</strong> {msg.message}
