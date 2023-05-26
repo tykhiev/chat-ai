@@ -12,6 +12,7 @@ const FLASK_SERVER_URL = import.meta.env.VITE_REACT_APP_API_URL;
 console.log("FLASK_SERVER_URL:", FLASK_SERVER_URL);
 
 interface Message {
+  [x: string]: any;
   user: string;
   message: string;
 }
@@ -90,15 +91,13 @@ const App: React.FC = () => {
       <div
         className={
           "w-full max-w-md max-h-[50rem] bg-white p-4 rounded-md shadow-md overflow-auto" +
-          (messages.length === 0 ? "" : "hidden")
+          (messages.length ? "" : " hidden")
         }
       >
         {messages.map((msg, index) => (
           <p
             key={index}
-            className={
-              "mb-2 " + (msg.user ? "text-right" : "text-left") // Add this line
-            }
+            className={"mb-2 " + (msg.isUser ? "text-right" : "text-left")}
           >
             <strong className="font-semibold">{msg.user}:</strong> {msg.message}
           </p>
@@ -106,7 +105,7 @@ const App: React.FC = () => {
         <div ref={messagesEndRef} />
         {isLoading && (
           <p className="text-sm italic text-gray-500 opacity-50">
-            Bots are replying, please wait...
+            GPTs are replying, please wait...
           </p>
         )}
       </div>
