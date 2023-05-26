@@ -8,7 +8,8 @@ import React, {
 import axios from "axios";
 import "./App.css";
 
-const FLASK_SERVER_URL = import.meta.env.API_URL;
+const FLASK_SERVER_URL = import.meta.env.VITE_REACT_APP_API_URL;
+console.log("FLASK_SERVER_URL:", FLASK_SERVER_URL);
 
 interface Message {
   user: string;
@@ -89,7 +90,7 @@ const App: React.FC = () => {
       <div
         className={
           "w-full max-w-md max-h-[50rem] bg-white p-4 rounded-md shadow-md overflow-auto" +
-          (messages.length ? "" : "hidden")
+          (messages.length === 0 ? "" : "hidden")
         }
       >
         {messages.map((msg, index) => (
