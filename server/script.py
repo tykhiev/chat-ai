@@ -1,10 +1,14 @@
 from flask import Flask, request, jsonify
 import openai
 from flask_cors import CORS
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = Flask(__name__)
 CORS(app)
-openai.api_key = "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"
+openai.api_key = os.getenv("API_KEY")
 
 
 defaultAngry = {
