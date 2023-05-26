@@ -86,11 +86,11 @@ const App: React.FC = () => {
 
   return (
     <div className="bg-svg flex flex-col items-center justify-center min-h-screen bg-gray-100">
-      <h1 className="text-3xl font-bold mb-5">Chat with Bots</h1>
+      <h1 className="text-3xl font-bold mb-5 text-blue-500">Chat with Bots</h1>
 
       <div
         className={
-          "w-full max-w-md max-h-[50rem] bg-white p-4 rounded-md shadow-md overflow-auto" +
+          "opacity-90 w-full max-w-md max-h-[50rem] bg-white p-4 rounded-md shadow-md overflow-auto" +
           (messages.length ? "" : " hidden")
         }
       >
