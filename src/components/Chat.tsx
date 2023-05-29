@@ -88,14 +88,14 @@ const Chat: React.FC = () => {
   return (
     <div className="bg-svg flex flex-col items-center justify-center min-h-screen bg-gray-100 overflow-x-hidden">
       <div className="flex justify-items-center">
-        <div className="bg-white bg-opacity-40 rounded-md">
+        <div>
           <h1 className="text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">
-            Chat with Bots
+            Chat with GPTs
           </h1>
         </div>
         <Link
           to="/interactive"
-          className="mx-auto px-4 py-2 rounded-md bg-blue-500 text-white font-bold border border-gray-800 mb-2 md:mb-0"
+          className="mx-2 px-4 py-2 rounded-md bg-gradient-to-r from-cyan-500 to-blue-500 text-white font-bold border border-gray-800 mb-2 md:mb-0"
         >
           Go Interactive!
         </Link>
@@ -143,7 +143,7 @@ const Chat: React.FC = () => {
           />
           <button
             type="submit"
-            className="mx-2 px-4 py-2 h-auto rounded-md bg-blue-500 text-white font-bold border border-gray-800"
+            className="px-4 rounded-md bg-blue-500 text-white font-bold border border-gray-800"
           >
             Send
           </button>

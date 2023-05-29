@@ -86,7 +86,7 @@ const ChatInteractive: React.FC = () => {
         </h1>
         <Link
           to="/"
-          className="mx-2 px-2 py-2 rounded-md bg-blue-500 text-white font-bold border border-gray-800 mb-2 md:mb-0"
+          className="mx-2 px-4 py-2 rounded-md bg-gradient-to-r from-cyan-500 to-blue-500 text-white font-bold border border-gray-800 mb-2 md:mb-0"
         >
           Go Back Normal
         </Link>
