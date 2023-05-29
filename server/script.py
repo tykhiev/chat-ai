@@ -1,3 +1,4 @@
+from flask import jsonify
 from flask import Flask, request, jsonify
 import openai
 from flask_cors import CORS
@@ -13,21 +14,21 @@ openai.api_key = os.getenv("API_KEY")
 
 
 defaultAngry = {
-    "role": "system", "content": "You are Angry. Reply the user with an angry response. And do not act like a bot or an AI Model. You also know other bots in the conversation as well as their roles, Joy and Disgust."
+    "role": "system", "content": "You are angry. Your name isAngryGPT. Reply the user with an angry response. And do not act like a bot or an AI Model. You also know other bots in the conversation as well as their roles, JoyGPT and DisgustGPT. You sometimes respond to what they are saying."
 }
-savedAngry = [defaultAngry]
 defaultJoy = {
-    "role": "system", "content": "You are a cheerful chatbot. Reply the user with the most joyful response. And do not act like a bot or an AI Model. You also know other bots in the conversation as well as their roles, Anger and Disgust."
+    "role": "system", "content": "You are a cheerful. Your name is JoyGPT. Reply the user with the most joyful response. And do not act like a bot or an AI Model. You also know other bots in the conversation as well as their roles, AngryGPT and DisgustGPT. You sometimes respond to what they are saying."
 }
-savedJoy = [defaultJoy]
 defaultDisgust = {
-    "role": "system", "content": "You are a repulsive chatbot. Reply the user with the most disgusting response. And do not act like a bot or an AI Model. You also know other bots in the conversation as well as their roles, Joy and Anger."
+    "role": "system", "content": "You are a repulsive. Your name is DisgustGPT. Reply the user with the most disgusting response. And do not act like a bot or an AI Model. You also know other bots in the conversation as well as their roles, JoyGPT and AngryGPT. You sometimes respond to what they are saying."
 }
+# defaultFear = {
+#     "role": "system", "content": "You are a fearful chatbot. Reply the user with a fearful response. And do not act like a bot or an AI Model"
+# }
+savedAngry = [defaultAngry]
 savedDisgust = [defaultDisgust]
-defaultFear = {
-    "role": "system", "content": "You are a fearful chatbot. Reply the user with a fearful response. And do not act like a bot or an AI Model"
-}
-savedFear = [defaultFear]
+savedJoy = [defaultJoy]
+# savedFear = [defaultFear]
 modelGPT = "gpt-3.5-turbo"
 
 
@@ -92,8 +93,9 @@ async def interact_bots(num_turns=3):
     prompt = request.json['prompt']
     conversation = []
     bots = [savedAngry, savedJoy, savedDisgust]
-    bot_names = ["Angry", "Joy", "Disgust"]
+    bot_names = ["AngryGPT", "JoyGPT", "DisgustGPT"]
     current_bot = 0
+    responses = {}
 
     for bot in bots:
         bot.append({"role": "user", "content": prompt})
@@ -110,41 +112,18 @@ async def interact_bots(num_turns=3):
         res = response.json()["choices"][0]["message"]["content"]
         bot.append({"role": "assistant", "content": res})
 
+        # Get the previous messages from the user and other bots
+        user_messages = [m["content"] for m in bot if m["role"] == "user"]
+        bot_messages = [m["content"] for m in bot if m["role"] == "assistant"]
+
+        # Combine the previous messages into a single prompt
+        prompt = " ".join(user_messages + bot_messages + [res])
+
         print(f"{bot_names[current_bot]} bot: {res}")
-        prompt += f" {res}"
+        responses[bot_names[current_bot]] = res
         current_bot = (current_bot + 1) % len(bots)
 
-    return 'done'
-
-
-@app.route('/chat-group', methods=['POST'])
-def chat_group():
-    chatbot_roles = ['assistant', 'system', 'user']
-    chatbot_prompts = [savedAngry, savedJoy, savedDisgust]
-    chatbot_response = []
-
-    user_input = request.json['prompt']
-
-    conversation = [{"role": "user", "text": user_input}]
-
-    for _ in range(3):  # Number of interactions between chatbots
-        for role, prompt in zip(chatbot_roles, chatbot_prompts):
-            conversation_copy = [{"role": "user", "text": user_input}] + prompt
-
-            response = openai.Completion.create(
-                engine="davinci",
-                prompt=conversation_copy,
-                temperature=0.3,
-                max_tokens=60,
-                n=1,
-                stop=None,
-            )
-
-            res = response.choices[0].text
-            conversation.append({"role": role, "text": res})
-
-    data = jsonify({"messages": conversation})
-    return data
+    return jsonify(responses)
 
 
 @app.route('/delete', methods=['GET'])
@@ -152,11 +131,9 @@ def delete():
     savedAngry.clear()
     savedJoy.clear()
     savedDisgust.clear()
-    savedFear.clear()
     savedAngry.append(defaultAngry)
     savedJoy.append(defaultJoy)
     savedDisgust.append(defaultDisgust)
-    savedFear.append(defaultFear)
     return 'Deleted'
 
 

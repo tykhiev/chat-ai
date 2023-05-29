@@ -6,7 +6,8 @@ import React, {
   useEffect,
 } from "react";
 import axios from "axios";
-import "./App.css";
+import "./Chat.css";
+import { Link } from "react-router-dom";
 
 const FLASK_SERVER_URL = import.meta.env.VITE_REACT_APP_API_URL;
 console.log("FLASK_SERVER_URL:", FLASK_SERVER_URL);
@@ -32,7 +33,7 @@ const fetchBotResponse = async (
   }
 };
 
-const App: React.FC = () => {
+const Chat: React.FC = () => {
   const [userInput, setUserInput] = useState<string>("");
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -85,8 +86,20 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="bg-svg flex flex-col items-center justify-center min-h-screen bg-gray-100">
-      <h1 className="text-3xl font-bold mb-5 text-blue-500">Chat with Bots</h1>
+    <div className="bg-svg flex flex-col items-center justify-center min-h-screen bg-gray-100 overflow-x-hidden">
+      <div className="flex justify-items-center">
+        <div className="bg-white bg-opacity-40 rounded-md">
+          <h1 className="text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">
+            Chat with Bots
+          </h1>
+        </div>
+        <Link
+          to="/interactive"
+          className="mx-auto px-4 py-2 rounded-md bg-blue-500 text-white font-bold border border-gray-800 mb-2 md:mb-0"
+        >
+          Go Interactive!
+        </Link>
+      </div>
 
       <div
         className={
@@ -109,33 +122,34 @@ const App: React.FC = () => {
           </p>
         )}
       </div>
-      <form
-        onSubmit={handleUserSubmit}
-        className="flex w-full my-5 max-w-md mb-5"
-      >
-        <button
-          onClick={handleDeleteHistory}
-          type="button"
-          className="mx-auto px-4 py-2 rounded-md bg-blue-500 text-white font-bold border border-gray-800"
+      <div className="w-full max-w-md flex-col items-center justify-center ">
+        <form
+          onSubmit={handleUserSubmit}
+          className="w-full h-auto my-5 mb-5 flex md:flex-row justify-center"
         >
-          Clear
-        </button>
-        <input
-          type="text"
-          value={userInput}
-          onChange={handleUserInput}
-          placeholder="Begin your chat here"
-          className="flex-grow mr-2 rounded-md py-2 px-3 border border-gray-800"
-        />
-        <button
-          type="submit"
-          className="px-4 py-2 rounded-md bg-blue-500 text-white font-bold border border-gray-800"
-        >
-          Send
-        </button>
-      </form>
+          <button
+            onClick={handleDeleteHistory}
+            type="button"
+            className="mx-auto h-auto px-4 py-2 rounded-md bg-blue-500 text-white font-bold border border-gray-800 mb-2 md:mb-0"
+          >
+            Clear
+          </button>
+          <input
+            type="text"
+            value={userInput}
+            onChange={handleUserInput}
+            placeholder="Begin your chat here"
+            className="flex-grow h-auto mr-2 rounded-md py-2 px-3 border border-gray-800 mb-2 md:mb-0"
+          />
+          <button
+            type="submit"
+            className="mx-2 px-4 py-2 h-auto rounded-md bg-blue-500 text-white font-bold border border-gray-800"
+          >
+            Send
+          </button>
+        </form>
+      </div>
     </div>
   );
 };
-
-export default App;
+export default Chat;
