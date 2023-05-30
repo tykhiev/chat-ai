@@ -43,16 +43,16 @@ const Chat: React.FC = () => {
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const messagesRef = firestore.collection("messages");
-  const query = messagesRef.orderBy("createdAt").limit(50);
+  // const messagesRef = firestore.collection("messages");
+  // const query = messagesRef.orderBy("createdAt").limit(50);
 
-  const [messagesDoc] = useCollectionData(query, { idField: "id" });
+  // const [messagesDoc] = useCollectionData(query, { idField: "id" });
 
-  useEffect(() => {
-    console.log("messagesDoc:", messagesDoc);
-    // TODO: set the message to local state, On data load from firestore
-    setMessages(messagesDoc as unknown as Message[]);
-  }, [messagesDoc]);
+  // useEffect(() => {
+  //   console.log("messagesDoc:", messagesDoc);
+  //   // TODO: set the message to local state, On data load from firestore
+  //   setMessages(messagesDoc as unknown as Message[]);
+  // }, [messagesDoc]);
 
   // function saveToFirestore(messagesToSave: Message[]) {
   //   // Save data to firestore
@@ -107,17 +107,17 @@ const Chat: React.FC = () => {
   };
 
   return (
-    <div className=" bg-svg flex flex-col items-center justify-center min-h-screen bg-gray-100 overflow-x-hidden">
+    <div className="bg-svg flex flex-col items-center justify-center min-h-screen bg-gray-100 overflow-x-hidden">
       <NavBar />
-      <div className="flex justify-items-center">
+      <div className="flex flex-col justify-items-center md:flex-row">
         <div>
-          <h1 className="text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#69faf1] to-[#24c769]">
+          <h1 className="text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#69faf1] to-[#24c769] mb-2 md:mb-0">
             Chat with GPTs
           </h1>
         </div>
         <Link
           to="/interactive"
-          className="mx-2 px-4 py-2 rounded-md bg-gradient-to-r bg-[#24c769] text-white font-bold border border-gray-800 mb-2 md:mb-0"
+          className="justify-center mx-auto px-4 py-2 rounded-md bg-gradient-to-r bg-[#24c769] text-white font-bold border border-gray-800 mb-4 md:mb-0"
         >
           Go Interactive!
         </Link>
@@ -132,7 +132,7 @@ const Chat: React.FC = () => {
         {messages.map((msg, index) => (
           <p
             key={index}
-            className={"mb-2" + (msg.isUser ? "text-right" : "text-left")}
+            className={"mb-2 " + (msg.isUser ? "text-right" : "text-left")}
           >
             <strong className="font-bold">{msg.user}: </strong>
             <strong className="font-semibold">{msg.message}</strong>
@@ -148,7 +148,7 @@ const Chat: React.FC = () => {
       <div className="w-full max-w-md flex-col items-center justify-center ">
         <form
           onSubmit={handleUserSubmit}
-          className="w-full h-auto my-5 mb-5 flex md:flex-row justify-center"
+          className="w-full h-auto my-5 mb-5 flex flex-col md:flex-row justify-center"
         >
           <button
             onClick={handleDeleteHistory}
@@ -166,7 +166,7 @@ const Chat: React.FC = () => {
           />
           <button
             type="submit"
-            className="px-4 rounded-md bg-[#24c769] text-white font-bold border border-gray-800"
+            className="px-4 py-2 mx-auto rounded-md bg-[#24c769] text-white font-bold border border-gray-800 mt-2 md:mt-0 md:ml-2"
           >
             Send
           </button>
