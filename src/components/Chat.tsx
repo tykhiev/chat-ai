@@ -8,8 +8,6 @@ import React, {
 import axios from "axios";
 import "./Chat.css";
 import { Link } from "react-router-dom";
-import { useCollectionData } from "react-firebase-hooks/firestore";
-import { firestore } from "../firebase/config";
 import NavBar from "./Navbar";
 
 const FLASK_SERVER_URL = import.meta.env.VITE_REACT_APP_API_URL;
