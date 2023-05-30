@@ -8,6 +8,9 @@ import React, {
 import axios from "axios";
 import "./Chat.css";
 import { Link } from "react-router-dom";
+import { useCollectionData } from "react-firebase-hooks/firestore";
+import { auth, firestore } from "../firebase/config";
+import NavBar from "./Navbar";
 
 const FLASK_SERVER_URL = import.meta.env.VITE_REACT_APP_API_URL;
 console.log("FLASK_SERVER_URL:", FLASK_SERVER_URL);
@@ -39,6 +42,20 @@ const Chat: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const messagesRef = firestore.collection("messages");
+  const query = messagesRef.orderBy("createdAt").limit(50);
+
+  const [messagesDoc] = useCollectionData(query, { idField: "id" });
+
+  useEffect(() => {
+    console.log("messagesDoc:", messagesDoc);
+    // TODO: FUCKING SEt thE MESSages to your LOCAL STATE, On data load from firestore
+  }, [messagesDoc]);
+
+  function saveToDB(messagesToSave: Message[]) {
+    // Save data to db
+  }
 
   useEffect(() => {
     if (messagesEndRef.current) {
@@ -72,6 +89,8 @@ const Chat: React.FC = () => {
         { user: "DisgustGPT", message: disgustResponse },
       ]);
 
+      // save 4 latest message to db including user, angry, joy, disgust
+
       setIsLoading(false);
     }
   };
@@ -85,17 +104,21 @@ const Chat: React.FC = () => {
     }
   };
 
+  const signout = () => {
+    auth.signOut();
+  };
   return (
-    <div className="bg-svg flex flex-col items-center justify-center min-h-screen bg-gray-100 overflow-x-hidden">
+    <div className=" bg-svg flex flex-col items-center justify-center min-h-screen bg-gray-100 overflow-x-hidden">
+      <NavBar />
       <div className="flex justify-items-center">
         <div>
-          <h1 className="text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">
+          <h1 className="text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#69faf1] to-[#24c769]">
             Chat with GPTs
           </h1>
         </div>
         <Link
           to="/interactive"
-          className="mx-2 px-4 py-2 rounded-md bg-gradient-to-r from-cyan-500 to-blue-500 text-white font-bold border border-gray-800 mb-2 md:mb-0"
+          className="mx-2 px-4 py-2 rounded-md bg-gradient-to-r bg-[#24c769] text-white font-bold border border-gray-800 mb-2 md:mb-0"
         >
           Go Interactive!
         </Link>
@@ -103,16 +126,17 @@ const Chat: React.FC = () => {
 
       <div
         className={
-          "opacity-90 w-full max-w-md max-h-[50rem] bg-white p-4 rounded-md shadow-md overflow-auto" +
+          "opacity-80 w-full max-w-md max-h-[50rem] bg-white p-4 rounded-md shadow-md overflow-auto" +
           (messages.length ? "" : " hidden")
         }
       >
         {messages.map((msg, index) => (
           <p
             key={index}
-            className={"mb-2 " + (msg.isUser ? "text-right" : "text-left")}
+            className={"mb-2" + (msg.isUser ? "text-right" : "text-left")}
           >
-            <strong className="font-semibold">{msg.user}:</strong> {msg.message}
+            <strong className="font-bold">{msg.user}: </strong>
+            <strong className="font-semibold">{msg.message}</strong>
           </p>
         ))}
         <div ref={messagesEndRef} />
@@ -130,7 +154,7 @@ const Chat: React.FC = () => {
           <button
             onClick={handleDeleteHistory}
             type="button"
-            className="mx-auto h-auto px-4 py-2 rounded-md bg-blue-500 text-white font-bold border border-gray-800 mb-2 md:mb-0"
+            className="mx-auto h-auto px-4 py-2 rounded-md bg-[#24c769] text-white font-bold border border-gray-800 mb-2 md:mb-0"
           >
             Clear
           </button>
@@ -143,7 +167,7 @@ const Chat: React.FC = () => {
           />
           <button
             type="submit"
-            className="px-4 rounded-md bg-blue-500 text-white font-bold border border-gray-800"
+            className="px-4 rounded-md bg-[#24c769] text-white font-bold border border-gray-800"
           >
             Send
           </button>

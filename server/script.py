@@ -89,7 +89,7 @@ def generate_chat_response_disgust():
 
 
 @app.route('/interact', methods=['POST'])
-async def interact_bots(num_turns=3):
+async def interact_bots():
     prompt = request.json['prompt']
     conversation = []
     bots = [savedAngry, savedJoy, savedDisgust]

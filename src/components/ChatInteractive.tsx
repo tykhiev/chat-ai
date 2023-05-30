@@ -7,6 +7,7 @@ import React, {
 } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
+import NavBar from "./Navbar";
 
 const FLASK_SERVER_URL = import.meta.env.VITE_REACT_APP_API_URL;
 
@@ -79,14 +80,15 @@ const ChatInteractive: React.FC = () => {
   };
 
   return (
-    <div className="bg-svg flex flex-col items-center justify-center min-h-screen bg-gray-100 overflow-x-hidden">
+    <div className="interactive-svg flex flex-col items-center justify-center min-h-screen bg-gray-100 overflow-x-hidden">
+      <NavBar />
       <div className="mx-auto flex justify-items-center">
-        <h1 className="mx-auto text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">
+        <h1 className="mx-auto text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#e68535] to-[#a7331e]">
           Interactive Chat Group
         </h1>
         <Link
           to="/"
-          className="mx-2 px-4 py-2 rounded-md bg-gradient-to-r from-cyan-500 to-blue-500 text-white font-bold border border-gray-800 mb-2 md:mb-0"
+          className="mx-2 px-4 py-2 rounded-md bg-[#e68535] text-white font-bold border border-gray-800 mb-2 md:mb-0"
         >
           Go Back Normal
         </Link>
@@ -94,7 +96,7 @@ const ChatInteractive: React.FC = () => {
 
       <div
         className={
-          "opacity-90 w-full max-w-md max-h-[50rem] bg-white p-4 rounded-md shadow-md overflow-auto" +
+          "opacity-80 w-full max-w-md max-h-[50rem] bg-white p-4 rounded-md shadow-md overflow-auto" +
           (messages.length ? "" : " hidden")
         }
       >
@@ -121,7 +123,7 @@ const ChatInteractive: React.FC = () => {
           <button
             onClick={handleDeleteHistory}
             type="button"
-            className="mx-auto h-auto px-4 py-2 rounded-md bg-blue-500 text-white font-bold border border-gray-800 mb-2 md:mb-0"
+            className="mx-auto h-auto px-4 py-2 rounded-md bg-[#e68535] text-white font-bold border border-gray-800 mb-2 md:mb-0"
           >
             Clear
           </button>
@@ -134,7 +136,7 @@ const ChatInteractive: React.FC = () => {
           />
           <button
             type="submit"
-            className="px-4 py-2 rounded-md bg-blue-500 text-white font-bold border border-gray-800"
+            className="px-4 py-2 rounded-md bg-[#e68535] text-white font-bold border border-gray-800"
           >
             Send
           </button>

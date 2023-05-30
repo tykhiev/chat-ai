@@ -1,9 +1,14 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { auth } from "../firebase/config";
+
+const signout = () => {
+  auth.signOut();
+};
 
 const NavBar: React.FC = () => {
   return (
-    <nav className="bg-gray-800">
+    <nav className="bg-transparent w-full fixed top-0 z-10">
       <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
         <div className="relative flex items-center justify-between h-16">
           <div className="absolute inset-y-0 left-0 flex items-center sm:hidden">
@@ -48,23 +53,18 @@ const NavBar: React.FC = () => {
           </div>
           <div className="flex-1 flex items-center justify-center sm:items-stretch sm:justify-start">
             <div className="flex-shrink-0 flex items-center">
-              <Link to="/" className="text-white font-bold text-xl">
-                Chat App
-              </Link>
+              <p className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600 animate-gradient">
+                AI CHAT
+              </p>
             </div>
-            <div className="hidden sm:block sm:ml-6">
+            <div className="hidden sm:block sm:ml-6 ml-auto">
               <div className="flex space-x-4">
                 <Link
-                  to="/chat"
-                  className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
+                  onClick={signout}
+                  to="/"
+                  className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium items-end"
                 >
-                  Chat
-                </Link>
-                <Link
-                  to="/chatinteractie"
-                  className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
-                >
-                  Chat Interactive
+                  Sign Out
                 </Link>
               </div>
             </div>

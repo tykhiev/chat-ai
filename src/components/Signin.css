@@ -1,0 +1,26 @@
+@keyframes gradient-animation {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
+  }
+  
+  .animate-gradient {
+    background-size: 200% 200%;
+    animation: gradient-animation 2s ease infinite;
+  }
+
+  .bg-signin-svg {
+    background-image: url('../assets/SigninSVG.svg');
+    background-size: cover;
+    background-position: center;
+    width: 100vw;
+    height: 100vh;
+    opacity: 90%;
+    }
+  

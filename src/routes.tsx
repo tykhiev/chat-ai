@@ -1,12 +1,25 @@
 import { createBrowserRouter } from "react-router-dom";
 import Chat from "./components/Chat";
 import ChatInteractive from "./components/ChatInteractive";
+import SignIn from "./components/Signin.tsx";
+import Authenticated from "./App.tsx";
 
 export const router = createBrowserRouter([
   {
     path: "/",
-    element: <Chat />,
+    element: <Authenticated />,
+    children: [
+      {
+        path: "/",
+        element: <SignIn />,
+      },
+      {
+        path: "/chat",
+        element: <Chat />,
+      },
+    ],
   },
+
   {
     path: "/interactive",
     element: <ChatInteractive />,

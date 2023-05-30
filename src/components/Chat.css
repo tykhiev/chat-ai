@@ -1,9 +1,18 @@
 .bg-svg {
-    background-image: url('../assets/mySvg.svg');
+    background-image: url('../assets/chat.png');
     background-size: cover;
     background-position: center;
     width: 100vw;
     height: 100vh;
     opacity: 90%;
     }
+
+.interactive-svg {
+    background-image: url('../assets/interactive.png');
+    background-size: cover;
+    background-position: center;
+    width: 100vw;
+    height: 100vh;
+    opacity: 100%;
+}
   
