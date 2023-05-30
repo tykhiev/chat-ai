@@ -1,7 +1,6 @@
 import firebase from "firebase/app";
 import { auth } from "../firebase/config";
 import "./Signin.css";
-import SigninSVG from "../assets/signin.svg";
 
 const SignIn: React.FC = () => {
   const signInWithGoogle = () => {

@@ -50,11 +50,12 @@ const Chat: React.FC = () => {
 
   useEffect(() => {
     console.log("messagesDoc:", messagesDoc);
-    // TODO: FUCKING SEt thE MESSages to your LOCAL STATE, On data load from firestore
+    // TODO: set the message to local state, On data load from firestore
+    setMessages(messagesDoc as unknown as Message[]);
   }, [messagesDoc]);
 
-  function saveToDB(messagesToSave: Message[]) {
-    // Save data to db
+  function saveToFirestore(messagesToSave: Message[]) {
+    // Save data to firestore
   }
 
   useEffect(() => {
@@ -90,6 +91,7 @@ const Chat: React.FC = () => {
       ]);
 
       // save 4 latest message to db including user, angry, joy, disgust
+      saveToFirestore([]);
 
       setIsLoading(false);
     }
@@ -104,9 +106,6 @@ const Chat: React.FC = () => {
     }
   };
 
-  const signout = () => {
-    auth.signOut();
-  };
   return (
     <div className=" bg-svg flex flex-col items-center justify-center min-h-screen bg-gray-100 overflow-x-hidden">
       <NavBar />
