@@ -9,7 +9,7 @@ import axios from "axios";
 import "./Chat.css";
 import { Link } from "react-router-dom";
 import { useCollectionData } from "react-firebase-hooks/firestore";
-import { auth, firestore } from "../firebase/config";
+import { firestore } from "../firebase/config";
 import NavBar from "./Navbar";
 
 const FLASK_SERVER_URL = import.meta.env.VITE_REACT_APP_API_URL;
@@ -54,9 +54,9 @@ const Chat: React.FC = () => {
     setMessages(messagesDoc as unknown as Message[]);
   }, [messagesDoc]);
 
-  function saveToFirestore(messagesToSave: Message[]) {
-    // Save data to firestore
-  }
+  // function saveToFirestore(messagesToSave: Message[]) {
+  //   // Save data to firestore
+  // }
 
   useEffect(() => {
     if (messagesEndRef.current) {
@@ -91,7 +91,7 @@ const Chat: React.FC = () => {
       ]);
 
       // save 4 latest message to db including user, angry, joy, disgust
-      saveToFirestore([]);
+      // saveToFirestore([]);
 
       setIsLoading(false);
     }
