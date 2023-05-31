@@ -34,12 +34,15 @@ modelGPT = "gpt-3.5-turbo"
 
 @app.route('/angry', methods=['POST'])
 def generate_chat_response_angry():
-    prompt = request.json['prompt']
-    savedAngry.append({"role": "user", "content": prompt})
+    conversation = [defaultAngry]
+    history = request.json['history']
+
+    conversation.extend(history)
+    savedAngry.append({"role": "user", "content": request.json['prompt']})
 
     response = openai.ChatCompletion.create(
         model=modelGPT,
-        messages=savedAngry,
+        messages=conversation,
         temperature=0.3,
         n=1
     )
@@ -54,12 +57,15 @@ def generate_chat_response_angry():
 
 @app.route('/joy', methods=['POST'])
 def generate_chat_response_joy():
-    prompt = request.json['prompt']
-    savedJoy.append({"role": "user", "content": prompt})
+    conversation = [defaultJoy]
+    history = request.json['history']
+
+    conversation.extend(history)
+    conversation.append({"role": "user", "content": request.json['prompt']})
 
     response = openai.ChatCompletion.create(
         model=modelGPT,
-        messages=savedJoy,
+        messages=conversation,
         temperature=0.3,
         n=1
     )
@@ -72,12 +78,15 @@ def generate_chat_response_joy():
 
 @app.route('/disgust', methods=['POST'])
 def generate_chat_response_disgust():
-    prompt = request.json['prompt']
-    savedDisgust.append({"role": "user", "content": prompt})
+    conversation = [defaultDisgust]
+    history = request.json['history']
+
+    conversation.extend(history)
+    savedAngry.append({"role": "user", "content": request.json['prompt']})
 
     response = openai.ChatCompletion.create(
         model=modelGPT,
-        messages=savedDisgust,
+        messages=conversation,
         temperature=0.3,
         n=1
     )

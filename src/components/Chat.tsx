@@ -9,9 +9,12 @@ import axios from "axios";
 import "./Chat.css";
 import { Link } from "react-router-dom";
 import NavBar from "./Navbar";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { auth } from "../firebase/config";
+import { firestore } from "../firebase/config";
+import firebase from "firebase";
 
 const FLASK_SERVER_URL = import.meta.env.VITE_REACT_APP_API_URL;
-console.log("FLASK_SERVER_URL:", FLASK_SERVER_URL);
 
 interface Message {
   [x: string]: any;
@@ -21,11 +24,20 @@ interface Message {
 
 const fetchBotResponse = async (
   endpoint: string,
-  message: string
+  message: string,
+  history: Message[]
 ): Promise<string> => {
+  const mappedHistory = history.map((msg) => {
+    return {
+      role: msg.user === "You" ? "user" : "assistant",
+      content: msg.message,
+    };
+  });
+
   try {
     const response = await axios.post(`${FLASK_SERVER_URL}/${endpoint}`, {
       prompt: message,
+      history: mappedHistory,
     });
     return response.data;
   } catch (error) {
@@ -35,26 +47,15 @@ const fetchBotResponse = async (
 };
 
 const Chat: React.FC = () => {
+  const [user] = useAuthState(auth);
+
   const [userInput, setUserInput] = useState<string>("");
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isPageLoading, setIsPageLoading] = useState<boolean>(true);
+  const [docExist, setDocExist] = useState<boolean>(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
-
-  // const messagesRef = firestore.collection("messages");
-  // const query = messagesRef.orderBy("createdAt").limit(50);
-
-  // const [messagesDoc] = useCollectionData(query, { idField: "id" });
-
-  // useEffect(() => {
-  //   console.log("messagesDoc:", messagesDoc);
-  //   // TODO: set the message to local state, On data load from firestore
-  //   setMessages(messagesDoc as unknown as Message[]);
-  // }, [messagesDoc]);
-
-  // function saveToFirestore(messagesToSave: Message[]) {
-  //   // Save data to firestore
-  // }
 
   useEffect(() => {
     if (messagesEndRef.current) {
@@ -62,7 +63,20 @@ const Chat: React.FC = () => {
     }
   }, [messages]);
 
-  const handleUserInput = (e: ChangeEvent<HTMLInputElement>) => {
+  useEffect(() => {
+    if (user) {
+      firestore
+        .collection("messages")
+        .doc(user?.uid)
+        .get()
+        .then((doc) => {
+          setMessages(doc.data()?.history || []);
+          setDocExist(Boolean(doc.data()?.history));
+        });
+    }
+  }, [user]);
+
+  const handleUserInput = (e: ChangeEvent<HTMLTextAreaElement>) => {
     setUserInput(e.target.value);
   };
 
@@ -77,9 +91,17 @@ const Chat: React.FC = () => {
       setUserInput("");
       setIsLoading(true);
 
-      const angryResponse = await fetchBotResponse("angry", userInput);
-      const joyResponse = await fetchBotResponse("joy", userInput);
-      const disgustResponse = await fetchBotResponse("disgust", userInput);
+      const angryResponse = await fetchBotResponse(
+        "angry",
+        userInput,
+        messages
+      );
+      const joyResponse = await fetchBotResponse("joy", userInput, messages);
+      const disgustResponse = await fetchBotResponse(
+        "disgust",
+        userInput,
+        messages
+      );
 
       setMessages((prevMessages) => [
         ...prevMessages,
@@ -89,15 +111,37 @@ const Chat: React.FC = () => {
       ]);
 
       // save 4 latest message to db including user, angry, joy, disgust
-      // saveToFirestore([]);
+      await saveToFirestore([
+        { user: "You", message: userInput, isUser: true },
+        { user: "AngryGPT", message: angryResponse },
+        { user: "JoyGPT", message: joyResponse },
+        { user: "DisgustGPT", message: disgustResponse },
+      ]);
 
       setIsLoading(false);
     }
   };
 
+  async function saveToFirestore(newMessages: Message[]) {
+    if (!docExist) {
+      await firestore.collection("messages").doc(user?.uid).set({
+        history: newMessages,
+      });
+      setDocExist(true);
+      return;
+    }
+
+    await firestore
+      .collection("messages")
+      .doc(user?.uid)
+      .update({
+        history: firebase.firestore.FieldValue.arrayUnion(...newMessages),
+      });
+  }
+
   const handleDeleteHistory = async () => {
     try {
-      await axios.get(`${FLASK_SERVER_URL}/delete`);
+      await firestore.collection("messages").doc(user?.uid).delete();
       setMessages([]);
     } catch (error) {
       console.error("Error deleting history:", error);
@@ -105,11 +149,11 @@ const Chat: React.FC = () => {
   };
 
   return (
-    <div className="bg-svg flex flex-col items-center justify-center min-h-screen bg-gray-100 overflow-x-hidden">
+    <div className="py-14 bg-svg flex flex-col items-center justify-center min-h-screen bg-gray-100 overflow-x-hidden">
       <NavBar />
-      <div className="flex flex-col justify-items-center md:flex-row">
-        <div>
-          <h1 className="text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#69faf1] to-[#24c769] mb-2 md:mb-0">
+      <div className="py-2 flex flex-col justify-items-center md:flex-row">
+        <div className="mx-3">
+          <h1 className="text-3xl md:text-4xl text-center font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#69faf1] to-[#24c769] mb-2 md:mb-0">
             Chat with GPTs
           </h1>
         </div>
@@ -146,28 +190,37 @@ const Chat: React.FC = () => {
       <div className="w-full max-w-md flex-col items-center justify-center ">
         <form
           onSubmit={handleUserSubmit}
-          className="w-full h-auto my-5 mb-5 flex flex-col md:flex-row justify-center"
+          className="w-full h-auto my-5 mb-5 flex flex-col justify-center gap-2"
         >
-          <button
-            onClick={handleDeleteHistory}
-            type="button"
-            className="mx-auto h-auto px-4 py-2 rounded-md bg-[#24c769] text-white font-bold border border-gray-800 mb-2 md:mb-0"
-          >
-            Clear
-          </button>
-          <input
-            type="text"
+          <textarea
             value={userInput}
-            onChange={handleUserInput}
+            onChange={(e) => {
+              handleUserInput(e);
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                handleUserSubmit(e as unknown as FormEvent<HTMLFormElement>);
+              }
+            }}
             placeholder="Begin your chat here"
-            className="flex-grow h-auto mr-2 rounded-md py-2 px-3 border border-gray-800 mb-2 md:mb-0"
+            className="flex-grow mt-2 md:mt-0 rounded-md py-2 px-3 border border-gray-800 w-full md:w-auto"
           />
-          <button
-            type="submit"
-            className="px-4 py-2 mx-auto rounded-md bg-[#24c769] text-white font-bold border border-gray-800 mt-2 md:mt-0 md:ml-2"
-          >
-            Send
-          </button>
+          <div className="w-full flex justify-between">
+            <button
+              onClick={handleDeleteHistory}
+              type="button"
+              className="h-auto px-4 py-2 rounded-md bg-red-400 text-white font-bold border border-gray-800 mb-2 md:mb-0"
+            >
+              Clear
+            </button>
+            <button
+              type="submit"
+              className="mt-2 md:mt-0 px-4 py-2 rounded-md bg-[#24c769] text-white font-bold border border-gray-800"
+            >
+              Send
+            </button>
+          </div>
         </form>
       </div>
     </div>

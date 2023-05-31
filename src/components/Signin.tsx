@@ -13,14 +13,14 @@ const SignIn: React.FC = () => {
       <h1 className="text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600 animate-gradient">
         AI CHAT
       </h1>
-      <h2 className="text-4xl font-bold text-gray-800">
+      <h2 className="text-4xl font-bold text-gray-800 items-center justify-center text-center">
         Meet the Three Musketeers
       </h2>
-      <h3 className="text-4xl font-bold text-gray-800">Sign in</h3>
+      <h3 className="text-3xl font-bold text-gray-800">Sign in</h3>
       <div className="flex flex-col space-y-4">
         <button
           onClick={signInWithGoogle}
-          className="bg-purple-500 hover:bg-blue-700 text-white font-bold py-4 px-2 rounded-full shadow-md transition duration-300 ease-in-out flex items-center justify-center space-x-2 "
+          className="min-w-min bg-purple-500 hover:bg-blue-700 text-white font-bold mx-20 py-3 px-2.5 shadow-md rounded-2xl duration-200 ease-in-out flex items-center justify-center space-x-3"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -48,7 +48,7 @@ const SignIn: React.FC = () => {
           </svg>
           <span>Sign in with Google</span>
         </button>
-        <p className="text-gray-800 flex flex-col justify-center items-center space-y-6">
+        <p className="text-gray-800 flex flex-col text-center space-y-6">
           By continuing, you are agreeing to our Terms of Service and Privacy
           Policy.
         </p>

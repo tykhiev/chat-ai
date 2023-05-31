@@ -43,7 +43,7 @@ const ChatInteractive: React.FC = () => {
     }
   }, [messages]);
 
-  const handleUserInput = (e: ChangeEvent<HTMLInputElement>) => {
+  const handleUserInput = (e: ChangeEvent<HTMLTextAreaElement>) => {
     setUserInput(e.target.value);
   };
 
@@ -80,7 +80,7 @@ const ChatInteractive: React.FC = () => {
   };
 
   return (
-    <div className="interactive-svg flex flex-col items-center justify-center min-h-screen bg-gray-100 overflow-x-hidden">
+    <div className="py-14 interactive-svg flex flex-col items-center justify-center min-h-screen bg-gray-100 overflow-x-hidden">
       <NavBar />
       <div className="mx-auto flex justify-items-center flex-col md:flex-row">
         <Link
@@ -121,7 +121,7 @@ const ChatInteractive: React.FC = () => {
       <div className="w-full max-w-md inline-flex items-center justify-center">
         <form
           onSubmit={handleUserSubmit}
-          className="w-full my-5 mb-5 flex flex-col md:flex-row justify-center"
+          className="w-full h-auto my-5 mb-5 flex flex-col md:flex-row justify-center"
         >
           <button
             onClick={handleDeleteHistory}
@@ -130,10 +130,17 @@ const ChatInteractive: React.FC = () => {
           >
             Clear
           </button>
-          <input
-            type="text"
+          <textarea
             value={userInput}
-            onChange={handleUserInput}
+            onChange={(e) => {
+              handleUserInput(e);
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                handleUserSubmit(e as unknown as FormEvent<HTMLFormElement>);
+              }
+            }}
             placeholder="Begin your chat here"
             className="flex-grow mx-auto md:mx-2 mt-2 md:mt-0 rounded-md py-2 px-3 border border-gray-800 w-full md:w-auto"
           />
