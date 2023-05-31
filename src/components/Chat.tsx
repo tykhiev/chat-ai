@@ -52,7 +52,6 @@ const Chat: React.FC = () => {
   const [userInput, setUserInput] = useState<string>("");
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [isPageLoading, setIsPageLoading] = useState<boolean>(true);
   const [docExist, setDocExist] = useState<boolean>(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
