@@ -8,7 +8,7 @@ import React, {
 import axios from "axios";
 import { Link } from "react-router-dom";
 import NavBar from "./Navbar";
-import { auth, firestore, user } from "../firebase/config";
+import { auth, firestore } from "../firebase/config";
 import firebase from "firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
 
