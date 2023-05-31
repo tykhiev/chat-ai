@@ -16,7 +16,9 @@ const SignIn: React.FC = () => {
       <h2 className="text-4xl font-bold text-gray-800 items-center justify-center text-center">
         Meet the Three Musketeers
       </h2>
-      <h3 className="text-3xl font-bold text-gray-800">Sign in</h3>
+      <h3 className="text-3xl font-bold text-gray-800 text-center">
+        AngryGPT, JoyGPT and DisgustGPT
+      </h3>
       <div className="flex flex-col space-y-4">
         <button
           onClick={signInWithGoogle}

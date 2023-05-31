@@ -8,6 +8,9 @@ import React, {
 import axios from "axios";
 import { Link } from "react-router-dom";
 import NavBar from "./Navbar";
+import { auth, firestore, user } from "../firebase/config";
+import firebase from "firebase";
+import { useAuthState } from "react-firebase-hooks/auth";
 
 const FLASK_SERVER_URL = import.meta.env.VITE_REACT_APP_API_URL;
 
@@ -18,11 +21,19 @@ interface Message {
 }
 
 const fetchBotResponse = async (
-  message: string
+  message: string,
+  history: Message[]
 ): Promise<Record<string, string>> => {
+  const mappedHistory = history.map((msg) => {
+    return {
+      role: msg.user === "You" ? "user" : "assistant",
+      content: msg.message,
+    };
+  });
   try {
     const response = await axios.post(`${FLASK_SERVER_URL}/interact`, {
       prompt: message,
+      history: mappedHistory,
     });
     return response.data;
   } catch (error) {
@@ -31,9 +42,12 @@ const fetchBotResponse = async (
   }
 };
 const ChatInteractive: React.FC = () => {
+  const [user] = useAuthState(auth);
+
   const [userInput, setUserInput] = useState<string>("");
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [docExist, setDocExist] = useState<boolean>(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -42,6 +56,19 @@ const ChatInteractive: React.FC = () => {
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [messages]);
+
+  useEffect(() => {
+    if (user) {
+      firestore
+        .collection("messages_interactive")
+        .doc(user?.uid)
+        .get()
+        .then((doc) => {
+          setMessages(doc.data()?.history || []);
+          setDocExist(Boolean(doc.data()?.history));
+        });
+    }
+  }, [user]);
 
   const handleUserInput = (e: ChangeEvent<HTMLTextAreaElement>) => {
     setUserInput(e.target.value);
@@ -58,7 +85,7 @@ const ChatInteractive: React.FC = () => {
       setUserInput("");
       setIsLoading(true);
 
-      const responses = await fetchBotResponse(userInput);
+      const responses = await fetchBotResponse(userInput, messages);
       for (const [botName, response] of Object.entries(responses)) {
         setMessages((prevMessages) => [
           ...prevMessages,
@@ -66,13 +93,42 @@ const ChatInteractive: React.FC = () => {
         ]);
       }
 
+      await saveToFirestore([
+        ...messages,
+        { user: "You", message: userInput, isUser: true },
+        ...Object.entries(responses).map(([botName, response]) => ({
+          user: botName,
+          message: response,
+        })),
+      ]);
+
       setIsLoading(false);
     }
   };
 
+  async function saveToFirestore(newMessages: Message[]) {
+    if (!docExist) {
+      await firestore.collection("messages_interactive").doc(user?.uid).set({
+        history: newMessages,
+      });
+      setDocExist(true);
+      return;
+    }
+
+    await firestore
+      .collection("messages_interactive")
+      .doc(user?.uid)
+      .update({
+        history: firebase.firestore.FieldValue.arrayUnion(...newMessages),
+      });
+  }
+
   const handleDeleteHistory = async () => {
     try {
-      await axios.get(`${FLASK_SERVER_URL}/delete`);
+      await firestore
+        .collection("messages_interactive")
+        .doc(user?.uid)
+        .delete();
       setMessages([]);
     } catch (error) {
       console.error("Error deleting history:", error);
@@ -83,17 +139,16 @@ const ChatInteractive: React.FC = () => {
     <div className="py-14 interactive-svg flex flex-col items-center justify-center min-h-screen bg-gray-100 overflow-x-hidden">
       <NavBar />
       <div className="mx-auto flex justify-items-center flex-col md:flex-row">
-        <Link
-          to={"/chat"}
-          className="mx-auto text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#e68535] to-[#a7331e] mb-2 md:mb-0"
-        >
-          Interactive Chat Group
-        </Link>
+        <div className="mx-3">
+          <h1 className="text-3xl md:text-4xl text-center font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#e68535] to-[#a7331e] mb-2 md:mb-0">
+            Chat with GPTs
+          </h1>
+        </div>
         <Link
           to="/"
           className="mx-auto md:mx-2 px-4 py-2 rounded-md bg-[#e68535] text-white font-bold border border-gray-800 mb-2 md:mb-0"
         >
-          Go Back Normal
+          Go Normal
         </Link>
       </div>
 
@@ -121,15 +176,8 @@ const ChatInteractive: React.FC = () => {
       <div className="w-full max-w-md inline-flex items-center justify-center">
         <form
           onSubmit={handleUserSubmit}
-          className="w-full h-auto my-5 mb-5 flex flex-col md:flex-row justify-center"
+          className="w-full h-auto my-5 mb-5 flex flex-col justify-center gap-2"
         >
-          <button
-            onClick={handleDeleteHistory}
-            type="button"
-            className="mx-auto h-auto px-4 py-2 rounded-md bg-[#e68535] text-white font-bold border border-gray-800 mb-2 md:mb-0"
-          >
-            Clear
-          </button>
           <textarea
             value={userInput}
             onChange={(e) => {
@@ -142,14 +190,23 @@ const ChatInteractive: React.FC = () => {
               }
             }}
             placeholder="Begin your chat here"
-            className="flex-grow mx-auto md:mx-2 mt-2 md:mt-0 rounded-md py-2 px-3 border border-gray-800 w-full md:w-auto"
+            className="flex-grow mt-2 md:mt-0 rounded-md py-2 px-3 border border-gray-800 w-full md:w-auto"
           />
-          <button
-            type="submit"
-            className="mx-auto mt-2 md:mt-0 px-4 py-2 rounded-md bg-[#e68535] text-white font-bold border border-gray-800"
-          >
-            Send
-          </button>
+          <div className="w-full flex justify-between">
+            <button
+              onClick={handleDeleteHistory}
+              type="button"
+              className="h-auto px-4 py-2 rounded-md bg-red-400 text-white font-bold border border-gray-800 mb-2 md:mb-0"
+            >
+              Clear
+            </button>
+            <button
+              type="submit"
+              className="mt-2 md:mt-0 px-4 py-2 rounded-md bg-[#e68535] text-white font-bold border border-gray-800"
+            >
+              Send
+            </button>
+          </div>
         </form>
       </div>
     </div>
