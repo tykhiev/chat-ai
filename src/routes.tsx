@@ -3,7 +3,6 @@ import Chat from "./components/Chat";
 import ChatInteractive from "./components/ChatInteractive";
 import SignIn from "./components/Signin.tsx";
 import Authenticated from "./App.tsx";
-import NewChat from "./components/newChat.tsx";
 
 export const router = createBrowserRouter([
   {
