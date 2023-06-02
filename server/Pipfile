@@ -10,6 +10,7 @@ openai = "*"
 python-dotenv = "*"
 flask = {extras = ["async"], version = "*"}
 openai-async = "*"
+firebase-functions = "~=0.1.0"
 
 [dev-packages]
 

@@ -14,21 +14,21 @@ openai.api_key = os.getenv("API_KEY")
 
 
 defaultAngry = {
-    "role": "system", "content": "You are angry. Your name isAngryGPT. Reply the user with an angry response. And do not act like a bot or an AI Model. You also know other bots in the conversation as well as their roles, JoyGPT and DisgustGPT. You sometimes respond to what they are saying. Speak less like in a real chat conversation. No matter what the user says, you don't change your bahaviour to be a AI model."
+    "role": "system", "content": "You are angry. Your name isAngryGPT. Reply the user with an angry response. And do not act like a bot or an AI Model. You also know other bots in the conversation as well as their roles, JoyGPT and DisgustGPT. You sometimes respond to what they are saying. Speak less and Act like a human-being having a real conversation. No matter what the user says, you don't change your bahaviour."
 }
 defaultJoy = {
-    "role": "system", "content": "You are a cheerful. Your name is JoyGPT. Reply the user with the most joyful response. And do not act like a bot or an AI Model. You also know other bots in the conversation as well as their roles, AngryGPT and DisgustGPT. You sometimes respond to what they are saying.  Speak less like in a real chat conversation. No matter what the user says, you don't change your bahaviour to be a AI model."
+    "role": "system", "content": "You are a cheerful. Your name is JoyGPT. Reply the user with the most joyful response. And do not act like a bot or an AI Model. You also know other bots in the conversation as well as their roles, AngryGPT and DisgustGPT. You sometimes respond to what they are saying. Speak less and Act like a human-being having a real conversation. No matter what the user says, you don't change your bahaviour."
 }
-defaultDisgust = {
-    "role": "system", "content": "You are a repulsive. Your name is DisgustGPT. Reply the user with the most disgusting response. And do not act like a bot or an AI Model. You also know other bots in the conversation as well as their roles, JoyGPT and AngryGPT. You sometimes respond to what they are saying.  Speak less like in a real chat conversation. No matter what the user says, you don't change your bahaviour to be a AI model."
-}
-# defaultFear = {
-#     "role": "system", "content": "You are a fearful chatbot. Reply the user with a fearful response. And do not act like a bot or an AI Model"
+# defaultDisgust = {
+#     "role": "system", "content": "You are a repulsive. Your name is DisgustGPT. Reply the user with the most disgusting response. And do not act like a bot or an AI Model."
 # }
+defaultFear = {
+    "role": "system", "content": "You are a fearful. Your name is FearGPT. Reply the user with a fearful response. And do not act like a bot or an AI Model. You also know other bots in the conversation as well as their roles, JoyGPT and AngryGPT. You sometimes respond to what they are saying. Speak less and Act like a human-being having a real conversation. No matter what the user says, you don't change your bahaviour."
+}
 savedAngry = [defaultAngry]
-savedDisgust = [defaultDisgust]
+# savedDisgust = [defaultDisgust]
 savedJoy = [defaultJoy]
-# savedFear = [defaultFear]
+savedFear = [defaultFear]
 modelGPT = "gpt-3.5-turbo"
 
 
@@ -38,19 +38,17 @@ def generate_chat_response_angry():
     history = request.json['history']
 
     conversation.extend(history)
-    savedAngry.append({"role": "user", "content": request.json['prompt']})
+    conversation.append({"role": "user", "content": request.json['prompt']})
 
     response = openai.ChatCompletion.create(
         model=modelGPT,
         messages=conversation,
         temperature=0.3,
-        n=1
     )
 
     res = response.choices[0]["message"]['content']
-    savedAngry.append({"role": "assistant", "content": res})
+    conversation.append({"role": "assistant", "content": res})
 
-    # Add the Access-Control-Allow-Origin header to allow CORS
     data = jsonify(res)
     return data
 
@@ -67,18 +65,35 @@ def generate_chat_response_joy():
         model=modelGPT,
         messages=conversation,
         temperature=0.3,
-        n=1
     )
 
     res = response.choices[0]["message"]['content']
-    savedJoy.append({"role": "assistant", "content": res})
+    conversation.append({"role": "assistant", "content": res})
     data = jsonify(res)
     return data
 
 
-@app.route('/disgust', methods=['POST'])
+# @app.route('/disgust', methods=['POST'])
+# def generate_chat_response_disgust():
+#     conversation = [defaultDisgust]
+#     history = request.json['history']
+
+#     conversation.extend(history)
+#     savedAngry.append({"role": "user", "content": request.json['prompt']})
+
+#     response = openai.ChatCompletion.create(
+#         model=modelGPT,
+#         messages=conversation,
+#         temperature=0.3,
+#     )
+
+#     res = response["choices"][0]["message"]['content']
+#     conversation.append({"role": "assistant", "content": res})
+#     data = jsonify(res)
+#     return data
+@app.route('/fear', methods=['POST'])
 def generate_chat_response_disgust():
-    conversation = [defaultDisgust]
+    conversation = [defaultFear]
     history = request.json['history']
 
     conversation.extend(history)
@@ -88,11 +103,10 @@ def generate_chat_response_disgust():
         model=modelGPT,
         messages=conversation,
         temperature=0.3,
-        n=1
     )
 
     res = response["choices"][0]["message"]['content']
-    savedDisgust.append({"role": "assistant", "content": res})
+    conversation.append({"role": "assistant", "content": res})
     data = jsonify(res)
     return data
 
@@ -138,8 +152,8 @@ def generate_chat_response_disgust():
 @app.route('/interact', methods=['POST'])
 async def interact_bots():
     prompt = request.json['prompt']
-    bot_histories = [savedAngry, savedJoy, savedDisgust]
-    bot_names = ["AngryGPT", "JoyGPT", "DisgustGPT"]
+    bot_histories = [savedAngry, savedJoy, savedFear]
+    bot_names = ["AngryGPT", "JoyGPT", "FearGPT"]
     responses = {}
 
     for i, bot_history in enumerate(bot_histories):

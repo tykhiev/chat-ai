@@ -82,42 +82,44 @@ const Chat: React.FC = () => {
   const handleUserSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (userInput.trim()) {
-      setMessages((prevMessages) => [
-        ...prevMessages,
-        { user: "You", message: userInput, isUser: true },
-      ]);
+      const userMessage = { user: "You", message: userInput, isUser: true };
 
+      setMessages((prevMessages) => [...prevMessages, userMessage]);
       setUserInput("");
       setIsLoading(true);
 
-      const angryResponse = await fetchBotResponse(
-        "angry",
-        userInput,
-        messages
-      );
-      const joyResponse = await fetchBotResponse("joy", userInput, messages);
-      const disgustResponse = await fetchBotResponse(
-        "disgust",
-        userInput,
-        messages
-      );
+      try {
+        const angryResponse = await fetchBotResponse("angry", userInput, [
+          ...messages,
+          userMessage,
+        ]);
+        setMessages((prevMessages) => [
+          ...prevMessages,
+          { user: "AngryGPT", message: angryResponse },
+        ]);
 
-      setMessages((prevMessages) => [
-        ...prevMessages,
-        { user: "AngryGPT", message: angryResponse },
-        { user: "JoyGPT", message: joyResponse },
-        { user: "DisgustGPT", message: disgustResponse },
-      ]);
+        const joyResponse = await fetchBotResponse("joy", userInput, [
+          ...messages,
+          userMessage,
+          { user: "AngryGPT", message: angryResponse },
+        ]);
+        setMessages((prevMessages) => [
+          ...prevMessages,
+          { user: "JoyGPT", message: joyResponse },
+        ]);
 
-      // save 4 latest message to db including user, angry, joy, disgust
-      await saveToFirestore([
-        { user: "You", message: userInput, isUser: true },
-        { user: "AngryGPT", message: angryResponse },
-        { user: "JoyGPT", message: joyResponse },
-        { user: "DisgustGPT", message: disgustResponse },
-      ]);
+        const newMessages = [
+          userMessage,
+          { user: "AngryGPT", message: angryResponse },
+          { user: "JoyGPT", message: joyResponse },
+        ];
 
-      setIsLoading(false);
+        await saveToFirestore(newMessages);
+        setIsLoading(false);
+      } catch (error) {
+        console.error("Error fetching bot response:", error);
+        setIsLoading(false);
+      }
     }
   };
 
@@ -166,7 +168,7 @@ const Chat: React.FC = () => {
 
       <div
         className={
-          "opacity-80 w-full max-w-md max-h-[50rem] bg-white p-4 rounded-md shadow-md overflow-auto" +
+          "opacity-80 w-full max-w-md max-h-[75%] bg-white p-4 rounded-md shadow-md overflow-auto" +
           (messages.length ? "" : " hidden")
         }
       >
