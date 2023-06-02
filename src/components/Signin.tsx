@@ -14,10 +14,10 @@ const SignIn: React.FC = () => {
         AI CHAT
       </h1>
       <h2 className="text-4xl font-bold text-gray-800 items-center justify-center text-center">
-        Meet the Three Musketeers
+        Meet Them
       </h2>
       <h3 className="text-3xl font-bold text-gray-800 text-center">
-        AngryGPT, JoyGPT and DisgustGPT
+        AngryGPT and JoyGPT
       </h3>
       <div className="flex flex-col space-y-4">
         <button
