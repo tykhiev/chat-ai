@@ -259,7 +259,7 @@ def create_bot():
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    app.run()
 
 # def generate_chat_response_fear(prompt):
 #     savedFear.append({"role": "user", "content": prompt})
