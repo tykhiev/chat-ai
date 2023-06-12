@@ -30,6 +30,25 @@ savedAngry = [defaultAngry]
 savedJoy = [defaultJoy]
 savedFear = [defaultFear]
 modelGPT = "gpt-3.5-turbo"
+defaultEconomist = {
+    "role": "system",
+    "content": "You are Mark, professional economist. You are talking with a podcast host and a professional business analyst. You discuss with them. Please dont speak like an AI model"
+}
+
+defaultBizAnalyst = {
+    "role": "system",
+    "content": "You are John, professional business analyst. You are talking with a podcast host and a professional economist. You discuss with them. Please dont speak like an AI model"
+}
+
+defaultHost = {
+    "role": "system",
+    "content": "You are Jack, podcast host. You provide 3 random topics involving with business and economy for user to choose as soon as the user talks to you. When the user's content is 'continue', you join the conversation about the same topic the guests chose with the guests. You are discussing with economist and business analyst. Please dont speak like an AI model"
+}
+
+savedEconomist = [defaultEconomist]
+savedBizAnalyst = [defaultBizAnalyst]
+savedHost = [defaultHost]
+
 
 
 @app.route('/angry', methods=['POST'])
@@ -148,23 +167,22 @@ def generate_chat_response_disgust():
 
 #     return jsonify(responses)
 
-
-@app.route('/interact', methods=['POST'])
+@app.route('/conversation', methods=['POST'])
 async def interact_bots():
     prompt = request.json['prompt']
-    bot_histories = [savedAngry, savedJoy, savedFear]
-    bot_names = ["AngryGPT", "JoyGPT", "FearGPT"]
-    responses = {}
+    bot_histories = [savedHost, savedEconomist, savedBizAnalyst]
+    bot_names = ["Host", "Economist", "BizAnalyst"]
+    responses = []
 
     for i, bot_history in enumerate(bot_histories):
         bot_history.append({"role": "user", "content": prompt})
 
         response = await openai_async.chat_complete(
             openai.api_key,
-            timeout=15,
+            timeout=20,
             payload={
                 "model": modelGPT,
-                "messages": bot_history,
+                "messages": bot_history,    
             }
         )
 
@@ -181,10 +199,47 @@ async def interact_bots():
         prompt = " ".join(user_messages + bot_messages + [res])
 
         print(f"{bot_names[i]} bot: {res}")
-        responses[bot_names[i]] = res
+        responses.append({"user": bot_names[i], "message": res})
         i = (i + 1) % len(bot_histories)
 
     return jsonify(responses)
+
+# @app.route('/interact', methods=['POST'])
+# async def interact_bots():
+#     prompt = request.json['prompt']
+#     bot_histories = [savedAngry, savedJoy, savedFear]
+#     bot_names = ["AngryGPT", "JoyGPT", "FearGPT"]
+#     responses = {}
+
+#     for i, bot_history in enumerate(bot_histories):
+#         bot_history.append({"role": "user", "content": prompt})
+
+#         response = await openai_async.chat_complete(
+#             openai.api_key,
+#             timeout=15,
+#             payload={
+#                 "model": modelGPT,
+#                 "messages": bot_history,
+#             }
+#         )
+
+#         res = response.json()["choices"][0]["message"]["content"]
+#         bot_history.append({"role": "assistant", "content": res})
+
+#         # Get the previous messages from the user and other bots
+#         user_messages = [m["content"]
+#                          for m in bot_history if m["role"] == "user"]
+#         bot_messages = [m["content"]
+#                         for m in bot_history if m["role"] == "assistant"]
+
+#         # Combine the previous messages into a single prompt
+#         prompt = " ".join(user_messages + bot_messages + [res])
+
+#         print(f"{bot_names[i]} bot: {res}")
+#         responses[bot_names[i]] = res
+#         i = (i + 1) % len(bot_histories)
+
+#     return jsonify(responses)
 
 
 @app.route('/create-bot', methods=['POST'])

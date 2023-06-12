@@ -19,29 +19,31 @@ interface Message {
   user: string;
   message: string;
 }
-
 const fetchBotResponse = async (
-  message: string,
+  content: string,
   history: Message[]
-): Promise<Record<string, string>> => {
+): Promise<Message[] | null> => {
   const mappedHistory = history.map((msg) => {
     return {
       role: msg.user === "You" ? "user" : "assistant",
-      content: msg.message,
+      content: msg.content,
     };
   });
   try {
-    const response = await axios.post(`${FLASK_SERVER_URL}/interact`, {
-      prompt: message,
+    const response = await axios.post(`${FLASK_SERVER_URL}/conversation`, {
+      prompt: content,
       history: mappedHistory,
     });
     return response.data;
   } catch (error) {
     console.error("Error fetching response from /interact:", error);
-    return { error: "Error: Please try again in 1 min" };
+    return null;
   }
 };
+
 const ChatInteractive: React.FC = () => {
+  const [sendDisabled, setSendDisabled] = useState<boolean>(false);
+
   const [user] = useAuthState(auth);
 
   const [userInput, setUserInput] = useState<string>("");
@@ -61,7 +63,7 @@ const ChatInteractive: React.FC = () => {
     if (user) {
       firestore
         .collection("messages_interactive")
-        .doc(user?.uid)
+        .doc(user.uid)
         .get()
         .then((doc) => {
           setMessages(doc.data()?.history || []);
@@ -76,34 +78,30 @@ const ChatInteractive: React.FC = () => {
 
   const handleUserSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (sendDisabled) return;
     if (userInput.trim()) {
-      setMessages((prevMessages) => [
-        ...prevMessages,
+      const newMessages: Message[] = [
+        ...messages,
         { user: "You", message: userInput, isUser: true },
-      ]);
+      ];
 
+      setMessages(newMessages);
       setUserInput("");
       setIsLoading(true);
 
-      const responses = await fetchBotResponse(userInput, messages);
-      for (const [botName, response] of Object.entries(responses)) {
-        setMessages((prevMessages) => [
-          ...prevMessages,
-          { user: botName, message: response },
-        ]);
-      }
+      const responses = await fetchBotResponse(userInput, newMessages);
+      responses?.forEach((each) => {
+        newMessages.push(each);
+        setMessages([...newMessages]);
+      });
 
-      await saveToFirestore([
-        ...messages,
-        { user: "You", message: userInput, isUser: true },
-        ...Object.entries(responses).map(([botName, response]) => ({
-          user: botName,
-          message: response,
-        })),
-      ]);
+      await saveToFirestore(newMessages);
 
       setIsLoading(false);
+      console.log("newMessages", newMessages);
     }
+
+    setSendDisabled(true);
   };
 
   async function saveToFirestore(newMessages: Message[]) {
@@ -141,7 +139,7 @@ const ChatInteractive: React.FC = () => {
       <div className=" py-2 mx-auto flex justify-items-center flex-col md:flex-row">
         <div className="mx-3">
           <h1 className="text-3xl md:text-4xl text-center font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#e68535] to-[#a7331e] mb-2 md:mb-0">
-            Chat with GPTs
+            AI Podcast
           </h1>
         </div>
         <Link
@@ -158,12 +156,14 @@ const ChatInteractive: React.FC = () => {
           (messages.length ? "" : " hidden")
         }
       >
+        {/* render message */}
         {messages.map((msg, index) => (
           <p
             key={index}
             className={"mb-2 " + (msg.isUser ? "text-right" : "text-left")}
           >
-            <strong className="font-semibold">{msg.user}:</strong> {msg.message}
+            <strong className="font-semibold">{msg?.user}:</strong>{" "}
+            {msg?.message}
           </p>
         ))}
         <div ref={messagesEndRef} />
@@ -173,6 +173,7 @@ const ChatInteractive: React.FC = () => {
           </p>
         )}
       </div>
+
       <div className="w-full max-w-md inline-flex items-center justify-center">
         <form
           onSubmit={handleUserSubmit}
@@ -202,7 +203,7 @@ const ChatInteractive: React.FC = () => {
             </button>
             <button
               type="submit"
-              className="mt-2 md:mt-0 px-4 py-2 rounded-md bg-[#e68535] text-white font-bold border border-gray-800"
+              className={`mt-2 md:mt-0 px-4 py-2 rounded-md text-white font-bold border border-gray-800 bg-[#e68535]`}
             >
               Send
             </button>
