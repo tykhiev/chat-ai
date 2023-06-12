@@ -40,14 +40,9 @@ defaultBizAnalyst = {
     "content": "You are John, professional business analyst. You are talking with a podcast host and a professional economist. You discuss with them. Please dont speak like an AI model"
 }
 
-defaultHost = {
-    "role": "system",
-    "content": "You are Jack, podcast host. You provide 3 random topics involving with business and economy for user to choose as soon as the user talks to you. When the user's content is 'continue', you join the conversation about the same topic the guests chose with the guests. You are discussing with economist and business analyst. Please dont speak like an AI model"
-}
 
 savedEconomist = [defaultEconomist]
 savedBizAnalyst = [defaultBizAnalyst]
-savedHost = [defaultHost]
 
 
 
