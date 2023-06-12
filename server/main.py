@@ -170,8 +170,8 @@ def generate_chat_response_disgust():
 @app.route('/conversation', methods=['POST'])
 async def interact_bots():
     prompt = request.json['prompt']
-    bot_histories = [savedHost, savedEconomist, savedBizAnalyst]
-    bot_names = ["Host", "Economist", "BizAnalyst"]
+    bot_histories = [savedEconomist, savedBizAnalyst]
+    bot_names = ["Economist", "BizAnalyst"]
     responses = []
 
     for i, bot_history in enumerate(bot_histories):
