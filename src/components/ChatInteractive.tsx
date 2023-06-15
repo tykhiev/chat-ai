@@ -134,7 +134,7 @@ const ChatInteractive: React.FC = () => {
       <div className=" py-2 mx-auto flex justify-items-center flex-col md:flex-row">
         <div className="mx-3">
           <h1 className="text-3xl md:text-4xl text-center font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#e68535] to-[#a7331e] mb-2 md:mb-0">
-            AI Podcast
+            AI Assistant
           </h1>
         </div>
         <Link
