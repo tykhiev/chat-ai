@@ -165,6 +165,12 @@ const Chat: React.FC = () => {
           Go Interactive!
         </Link>
       </div>
+      <p className="text-center text-sm mb-5  font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#69faf1] to-[#24c769]">
+        Chat with our AngryGPT and JoyGPT.
+      </p>
+      <p className="text-center text-sm mb-5  font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#69faf1] to-[#24c769]">
+        Try in a minute gap.
+      </p>
 
       <div
         className={
@@ -227,4 +233,5 @@ const Chat: React.FC = () => {
     </div>
   );
 };
+
 export default Chat;

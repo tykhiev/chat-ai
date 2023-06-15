@@ -14,14 +14,13 @@ export const router = createBrowserRouter([
         element: <SignIn />,
       },
       {
-        path: "/chat",
-        element: <Chat />,
+        path: "/interactive",
+        element: <ChatInteractive />,
       },
     ],
   },
-
   {
-    path: "/interactive",
-    element: <ChatInteractive />,
+    path: "/chat",
+    element: <Chat />,
   },
 ]);

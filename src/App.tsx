@@ -9,7 +9,7 @@ const Authenticated = () => {
 
   useEffect(() => {
     if (user) {
-      to("/chat");
+      to("/interactive");
     } else {
       to("/");
     }

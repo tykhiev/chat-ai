@@ -42,8 +42,6 @@ const fetchBotResponse = async (
 };
 
 const ChatInteractive: React.FC = () => {
-  const [sendDisabled, setSendDisabled] = useState<boolean>(false);
-
   const [user] = useAuthState(auth);
 
   const [userInput, setUserInput] = useState<string>("");
@@ -78,7 +76,6 @@ const ChatInteractive: React.FC = () => {
 
   const handleUserSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (sendDisabled) return;
     if (userInput.trim()) {
       const newMessages: Message[] = [
         ...messages,
@@ -100,8 +97,6 @@ const ChatInteractive: React.FC = () => {
       setIsLoading(false);
       console.log("newMessages", newMessages);
     }
-
-    setSendDisabled(true);
   };
 
   async function saveToFirestore(newMessages: Message[]) {
@@ -143,12 +138,19 @@ const ChatInteractive: React.FC = () => {
           </h1>
         </div>
         <Link
-          to="/"
+          to="/chat"
           className="mx-auto md:mx-2 px-4 py-2 rounded-md bg-[#e68535] text-white font-bold border border-gray-800 mb-2 md:mb-0"
         >
           Go Normal
         </Link>
       </div>
+      <p className="text-center text-lg mb-5  font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#e68535] to-[#a7331e]">
+        Chat with our Economist and Business Analyst.
+      </p>
+
+      <p className="text-center text-sm mb-5  font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#e68535] to-[#a7331e]">
+        Try in a minute gap.
+      </p>
 
       <div
         className={
