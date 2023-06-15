@@ -11,14 +11,11 @@ const SignIn: React.FC = () => {
   return (
     <section className="bg-signin-svg flex flex-col items-center justify-center h-screen space-y-6">
       <h1 className="text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600 animate-gradient">
-        AI CHAT
+        AI Assistant
       </h1>
       <h2 className="text-4xl font-bold text-gray-800 items-center justify-center text-center">
-        Meet Them
+        Let's get started
       </h2>
-      <h3 className="text-3xl font-bold text-gray-800 text-center">
-        AngryGPT and JoyGPT
-      </h3>
       <div className="flex flex-col space-y-4">
         <button
           onClick={signInWithGoogle}

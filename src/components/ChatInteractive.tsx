@@ -139,9 +139,9 @@ const ChatInteractive: React.FC = () => {
         </div>
         <Link
           to="/chat"
-          className="mx-auto md:mx-2 px-4 py-2 rounded-md bg-[#e68535] text-white font-bold border border-gray-800 mb-2 md:mb-0"
+          className="mx-auto md:mx-2 px-4 py-2 rounded-md  bg-[#e68535] text-white font-bold border border-gray-800 mb-2 md:mb-0"
         >
-          Go Normal
+          Have fun
         </Link>
       </div>
       <p className="text-center text-lg mb-5  font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#e68535] to-[#a7331e]">
